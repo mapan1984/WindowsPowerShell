@@ -1,5 +1,8 @@
 ﻿Push-Location (Split-Path -Path $MyInvocation.MyCommand.Definition -Parent)
 
+# Load PSColor
+Import-Module PSColor
+
 # Load posh-git module
 Import-Module posh-git
 
@@ -13,16 +16,16 @@ function global:prompt {
     Write-Host
     Write-Host "# " -NoNewline -ForegroundColor Blue
     Write-Host $env:USERNAME -NoNewline -ForegroundColor Cyan
-    Write-Host " in " -NoNewline
+    Write-Host " in " -NoNewline -ForegroundColor Gray
     #Write-Host $path" " -NoNewline -ForegroundColor Green
     Write-Host ($pwd.ProviderPath)" " -NoNewline -ForegroundColor Green
     
-    # for git
+    # posh-git for git
     $realLASTEXITCODE = $LASTEXITCODE
     Write-VcsStatus
     $global:LASTEXITCODE = $realLASTEXITCODE
     
-    Write-Host $Date 
+    Write-Host " "$Date -ForegroundColor Gray
     Write-Host ">" -NoNewline -ForegroundColor Magenta
 
     return " " 
