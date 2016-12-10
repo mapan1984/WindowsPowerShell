@@ -1,24 +1,24 @@
 function Get-ChildItemColor
-{  
-<#  
-.Synopsis  
-  Returns childitems with colors by type.  
-  
-.Description  
-  This function wraps Get-ChildItem and tries to output the results  
-  
-  color-coded by type:  
-    Directories - Cyan  
-    Compressed - Red  
-    Executables - Green  
-    Text Files - Gray  
-    Image Files - Magenta  
-    Others - Gray  
-    
-.ReturnValue  
-  All objects returned by Get-ChildItem are passed down the pipeline  
-  unmodified.   
-#>  
+{
+<#
+.Synopsis
+  Returns childitems with colors by type.
+
+.Description
+  This function wraps Get-ChildItem and tries to output the results
+
+  color-coded by type:
+    Directories - Cyan
+    Compressed - Red
+    Executables - Green
+    Text Files - Gray
+    Image Files - Magenta
+    Others - Gray
+
+.ReturnValue
+  All objects returned by Get-ChildItem are passed down the pipeline
+  unmodified.
+#>
 
 
     $regex_opts = ([System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor [System.Text.RegularExpressions.RegexOptions]::Compiled)
@@ -38,8 +38,8 @@ function Get-ChildItemColor
         elseif ($executable.IsMatch($_.Name)) { $Host.UI.RawUI.ForegroundColor = 'Green' }
         elseif ($text_files.IsMatch($_.Name)) { $Host.UI.RawUI.ForegroundColor = 'Gray' }
         elseif ($image_files.IsMatch($_.Name)) { $Host.UI.RawUI.ForegroundColor = 'Magenta' }
-        else { $Host.UI.RawUI.ForegroundColor = 'Gray' }  
-        echo $_ 
+        else { $Host.UI.RawUI.ForegroundColor = 'Gray' }
+        echo $_
         $Host.UI.RawUI.ForegroundColor = $fore
     }
 }
