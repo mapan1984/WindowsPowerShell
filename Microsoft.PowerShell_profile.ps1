@@ -1,26 +1,44 @@
-﻿<#Push-Location (Split-Path -Path $MyInvocation.MyCommand.Definition -Parent)#>
+﻿<#
+Push-Location (Split-Path -Path $MyInvocation.MyCommand.Definition -Parent)
+#>
 
-# Load PSColor
+### Load Module Plug
 Import-Module PSColor
-
-# Load posh-git module
 Import-Module posh-git
+Import-Module PowerTab -ArgumentList ".\PowerTabConfig.xml"
+Import-Module PsGet
 
-# Load powershell tab
-Import-Module PowerTab -ArgumentList "F:\Documents\WindowsPowerShell\PowerTabConfig.xml"
+### All alias
+Set-Alias -Name l -Value Get-ChildItem
+Set-Alias -Name vi -Value Code
 
-# Set up a simple prompt, adding the git prompt parts inside git repos
+### Set up prompt
+# Get full name of user
+$username = $env:UserName
+$hostname = $env:ComputerName
+
+# Am I an admin?
+$wid = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+$prp = new-object System.Security.Principal.WindowsPrincipal($wid)
+$adm = [System.Security.Principal.WindowsBuiltInRole]::Administrator
+$IsAdmin = $prp.IsInRole($adm)
+
+# Here we go
 function global:prompt {
+    $realLASTEXITCODE = $LASTEXITCODE
 
-    #$path = Split-Path -leaf -path (Get-Location)
-    $Date = Get-Date
+    # username@hostname
+    if($IsAdmin){
+        write-host $username -nonewline -ForegroundColor Red
+    } else {
+        write-host $username -nonewline -ForegroundColor Cyan
+    }
+    Write-Host ("@") -nonewline -foregroundcolor Gray
+    Write-Host ($hostname) -nonewline -foregroundcolor DarkCyan
 
-    Write-Host
-    Write-Host "# " -NoNewline -ForegroundColor Blue
-    Write-Host $env:USERNAME -NoNewline -ForegroundColor Cyan
-    Write-Host " in " -NoNewline -ForegroundColor Gray
-    #Write-Host $path" " -NoNewline -ForegroundColor Green
-    Write-Host ($pwd.ProviderPath)" " -NoNewline -ForegroundColor Green
+    # current path
+    write-Host " Ω " -nonewline -ForegroundColor Gray
+    Write-Host ($pwd.ProviderPath) -nonewline -ForegroundColor Green
 
     <# posh-git for git: show information if in git rep #>
     $realLASTEXITCODE = $LASTEXITCODE
@@ -28,8 +46,17 @@ function global:prompt {
     $global:LASTEXITCODE = $realLASTEXITCODE
     <# posh-git for git: end #>
 
-    Write-Host " "$Date -ForegroundColor Gray
+    # Rightmost time display
+    $currentY = [console]::CursorTop        # Save cursor position first
+    $columns = (Get-Host).UI.RawUI.windowsize.width    # Column quantity of console window
+    [console]::SetCursorPosition($columns - 8, $currentY)
+    write-host "{" -nonewline -ForegroundColor Yellow
+    write-host (Get-Date -format "HH:mm") -nonewline -ForegroundColor Cyan
+    write-host "}" -ForegroundColor Yellow
+
     Write-Host ">" -NoNewline -ForegroundColor Magenta
+
+    $global:LASTEXITCODE = $realLASTEXITCODE
 
     return " "
 }

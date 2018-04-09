@@ -37,161 +37,113 @@ Set-Variable -Name PSGET_PSD1 -Value 'PSD1' -Option Constant -Scope Script
 <#
     .SYNOPSIS
         Installs PowerShell modules from a variety of sources including: Nuget, PsGet module directory, local directory, zipped folder and web URL.
-
     .DESCRIPTION
         Supports installing modules for the current user or all users (if elevated).
-
     .PARAMETER Module
         Name of the module to install.
-
     .PARAMETER ModuleUrl
         URL to the module to install; Can be direct link to PSM1 file or ZIP file. Can be a shortened link.
-
     .PARAMETER ModulePath
         Local path to the module to install.
-
     .PARAMETER ModuleName
        In context with -ModuleUrl or -ModulePath it is not always possible to interfere the right ModuleName, eg. the filename is unknown or the zip archive contains multiple modules.
-
     .PARAMETER Type
         When ModuleUrl or ModulePath specified, allows specifying type of the package. Can be ZIP or PSM1.
-
     .PARAMETER NuGetPackageId
         NuGet package name containing the module to install.
-
     .PARAMETER PackageVersion
         Allows a specific version of the specified NuGet package to used, if not specified then the latest stable version will be used.
-
     .PARAMETER NugetSource
         URL to the NuGet feed containing the package.
-
     .PARAMETER PreRelease
         If PackageVersion is not specified, then this switch allows the latest prerelease package to be used.
-
     .PARAMETER PreReleaseTag
         If PackageVersion is not specified, then this parameter allows the latest version of a particular prerelease tag to be used
-
     .PARAMETER Destination
         When specified the module will be installed below this path. Defaults to '$global:PsGetDestinationModulePath' if defined.
-
     .PARAMETER ModuleHash
         When ModuleHash is specified the chosen module will only be installed if its contents match the provided hash.
-
     .PARAMETER Global
         If set, attempts to install the module to the all users location in C:\Program Files\Common Files\Modules...
-
         NOTE: If the -Destination directory is specified, then -Global will only have an effect in combination with '-PersistEnvironment'. This is also the case if '$global:PsGetDestinationModulePath' is defined.
-
     .PARAMETER DoNotImport
         Indicates that command should not import module after installation
-
     .PARAMETER AddToProfile
         Adds Import-Module statement for installed module to the profile.ps1
-
     .PARAMETER Update
         Forces module to be updated
-
     .PARAMETER DirectoryUrl
         URL to central directory. By default it uses the value in the $global:PsGetDirectoryUrl variable
-
     .PARAMETER PersistEnvironment
         If this switch is specified, the installation destination path will be added to either the User's PSModulePath environment variable or Machine's PSModulePath environment variable (if -Global specified)
-
     .PARAMETER InstallWithModuleName
         Allows to specify the name of the module and override the ModuleName normally used.
         NOTE: This parameter allows to install a module from the PsGet-Directory more than once and PsGet does not remember that this module is installed with a different name.
-
     .PARAMETER DoNotPostInstall
         If defined, the PostInstallHook is not executed.
-
     .PARAMETER PostInstallHook
         Defines the name of a script inside the installed module folder which should be executed after installation.
         Default: definition in directory file or 'Install.ps1'
-
     .PARAMETER Force
         OBSOLETE
         Alternative name for 'Update'.
-
     .PARAMETER Startup
         OBSOLETE
         Alternative name for 'AddToProfile'.
-
     .LINK
         http://psget.net
-
     .EXAMPLE
         # Install-Module PsConfig -DoNotImport
-
         Description
         -----------
         Installs the module witout importing it to the current session
-
     .EXAMPLE
         # Install-Module PoshHg -AddToProfile
-
         Description
         -----------
         Installs the module and then adds impoer of the given module to your profile.ps1 file
-
     .EXAMPLE
         # Install-Module PsUrl
-
         Description
         -----------
         This command will query module information from central registry and install required stuff.
-
     .EXAMPLE
         # Install-Module -ModulePath .\Authenticode.psm1 -Global
-
         Description
         -----------
         Installs the Authenticode module to the System32\WindowsPowerShell\v1.0\Modules for all users to use.
-
     .EXAMPLE
         # Install-Module -ModuleUrl https://github.com/chaliy/psurl/raw/master/PsUrl/PsUrl.psm1
-
         Description
         -----------
         Installs the PsUrl module to the users modules folder
-
     .EXAMPLE
         # Install-Module -ModuleUrl http://bit.ly/e1X4BO -ModuleName "PsUrl"
-
         Description
         -----------
         Installs the PsUrl module with name specified, because command will not be able to guess it
-
     .EXAMPLE
         # Install-Module -ModuleUrl https://github.com/psget/psget/raw/master/TestModules/HelloWorld.zip
-
         Description
         -----------
         Downloads HelloWorld module (module can have more than one file) and installs it
-
     .EXAMPLE
         # Install-Module -NugetPackageId SomePackage
-
         Description
         -----------
         Downloads the latest stable version of the 'SomePackage' module from the NuGet Gallery
-
     .EXAMPLE
         # Install-Module -NugetPackageId SomePackage -PackageVersion 1.0.2-beta
-
         Description
         -----------
         Downloads the specified version of the 'SomePackage' module from the NuGet Gallery
-
     .EXAMPLE
         # Install-Module -NugetPackageId SomePackage -PreRelease
-
         Description
         -----------
         Downloads the latest pre-release version of the 'SomePackage' module from the NuGet Gallery
-
     .EXAMPLE
         # Install-Module -NugetPackageId SomePackage -PreReleaseTag beta -NugetSource http://myget.org/F/myfeed
-
         Description
         -----------
         Downloads the latest 'beta' pre-release version of the 'SomePackage' module from a custom NuGet feed
@@ -323,54 +275,38 @@ function Install-Module {
 <#
     .SYNOPSIS
         Updates a module.
-
     .DESCRIPTION
         Supports updating modules for the current user or all users (if elevated).
-
     .PARAMETER Module
         Name of the module to update.
-
     .PARAMETER All
         If -All is defined. all to PsGet known modules will be updated.
-
     .PARAMETER Destination
         When specified the module will be updated below this path.
-
     .PARAMETER ModuleHash
         When ModuleHash is specified the chosen module will only be installed if its contents match the provided hash.
-
     .PARAMETER Global
         If set, attempts to install the module to the all users location in Windows\System32...
-
     .PARAMETER DoNotImport
         Indicates that command should not import module after installation.
-
     .PARAMETER AddToProfile
         Adds installed module to the profile.ps1.
-
     .PARAMETER Update
         Forces module to be updated.
-
     .PARAMETER DirectoryUrl
         URL to central directory. By default it uses the value in the $PsGetDirectoryUrl global variable.
-
     .PARAMETER DoNotPostInstall
         If defined, the PostInstallHook is not executed.
-
     .PARAMETER PostInstallHook
         Defines the name of a script inside the installed module folder which should be executed after installation.
         Will not be check in combination with -All switch.
         Default: 'Install.ps1'
-
     .LINK
         http://psget.net
-
     .LINK
         Install-Module
-
     .EXAMPLE
         # Update-Module PsUrl
-
         Description
         -----------
         Updates the module
@@ -430,22 +366,16 @@ function Update-Module {
 <#
     .SYNOPSIS
         Retrieve information about module from central directory
-
     .DESCRIPTION
         Command will query central directory to get information about module specified.
-
     .PARAMETER ModuleName
         Name of module to look for in directory. Supports wildcards.
-
     .PARAMETER DirectoryUrl
         URL to central directory. By default it uses the value in the $PsGetDirectoryUrl global variable.
-
     .LINK
         http://psget.net
-
     .EXAMPLE
         Get-PsGetModuleInfo PoshCo*
-
         Description
         -----------
         Retrieves information about all registerd modules that starts with PoshCo.
@@ -563,23 +493,17 @@ function Get-PsGetModuleInfo {
 <#
     .SYNOPSIS
         Calculate the hash value of a module.
-
     .DESCRIPTION
         Calculate the hash value of the specified module directory for usage with the 'ModuleHash' parameter for validation.
-
     .PARAMETER Path
         Path to the module directory
-
     .EXAMPLE
         Get-PsGetModuleHash $global:UserModuleBasePath\PsGet
-
         Description
         -----------
         Returns the hash value usable with the 'ModuleHash' parameter of 'Install-Module'
-
     .LINK
         Install-Module
-
     .LINK
         http://psget.net
 #>
@@ -602,43 +526,30 @@ function Get-PsGetModuleHash {
 <#
     .SYNOPSIS
         Install a module from the defined PsGet directory.
-
     .PARAMETER Module
         Name of the module to install from PsGet directory.
-
     .PARAMETER Destination
         When specified the module will be installed below this path. Defaults to '$global:PsGetDestinationModulePath' if defined.
-
     .PARAMETER ModuleHash
         When ModuleHash is specified the chosen module will only be installed if its contents match the provided hash.
-
     .PARAMETER Global
         If set, attempts to install the module to the all users location in C:\Program Files\Common Files\Modules...
-
         NOTE: If the -Destination directory is specified, then -Global will only have an effect in combination with '-PersistEnvironment'. This is also the case if '$global:PsGetDestinationModulePath' is defined.
-
     .PARAMETER DoNotImport
         Indicates that command should not import module after installation
-
     .PARAMETER AddToProfile
         Adds Import-Module statement for installed module to the profile.ps1
-
     .PARAMETER Update
         Forces module to be updated
-
     .PARAMETER DirectoryUrl
         URL to central directory. By default it uses the value in the $global:PsGetDirectoryUrl variable
-
     .PARAMETER PersistEnvironment
         If this switch is specified, the installation destination path will be added to either the User's PSModulePath environment variable or Machine's PSModulePath environment variable (if -Global specified)
-
     .PARAMETER InstallWithModuleName
         Allows to specify the name of the module and override the ModuleName normally used.
         NOTE: This parameter allows to install a module from the PsGet-Directory more than once and PsGet does not remember that this module is installed with a different name.
-
     .PARAMETER DoNotPostInstall
         If defined, the PostInstallHook is not executed.
-
     .PARAMETER PostInstallHook
         Defines the name of a script inside the installed module folder which should be executed after installation.
         Default: definition in directory file or 'Install.ps1'
@@ -724,46 +635,32 @@ function Install-ModuleFromDirectory {
 <#
     .SYNOPSIS
         Install a module from a provided download location.
-
     .PARAMETER ModuleUrl
         URL to the module to install; Can be direct link to PSM1 file or ZIP file. Can be a shortened link.
-
     .PARAMETER ModuleName
         It is not always possible to interfere the right ModuleName, eg. the filename is unknown or the zip archive contains multiple modules.
-
     .PARAMETER Type
         When ModuleUrl or ModulePath specified, allows specifying type of the package. Can be ZIP or PSM1.
-
     .PARAMETER Destination
         When specified the module will be installed below this path. Defaults to '$global:PsGetDestinationModulePath' if defined.
-
     .PARAMETER ModuleHash
         When ModuleHash is specified the chosen module will only be installed if its contents match the provided hash.
-
     .PARAMETER Global
         If set, attempts to install the module to the all users location in C:\Program Files\Common Files\Modules...
-
         NOTE: If the -Destination directory is specified, then -Global will only have an effect in combination with '-PersistEnvironment'. This is also the case if '$global:PsGetDestinationModulePath' is defined.
-
     .PARAMETER DoNotImport
         Indicates that command should not import module after installation
-
     .PARAMETER AddToProfile
         Adds Import-Module statement for installed module to the profile.ps1
-
     .PARAMETER Update
         Forces module to be updated
-
     .PARAMETER PersistEnvironment
         If this switch is specified, the installation destination path will be added to either the User's PSModulePath environment variable or Machine's PSModulePath environment variable (if -Global specified)
-
     .PARAMETER InstallWithModuleName
         Allows to specify the name of the module and override the ModuleName normally used.
         NOTE: This parameter allows to install a module from the PsGet-Directory more than once and PsGet does not remember that this module is installed with a different name.
-
     .PARAMETER DoNotPostInstall
         If defined, the PostInstallHook is not executed.
-
     .PARAMETER PostInstallHook
         Defines the name of a script inside the installed module folder which should be executed after installation.
         Default: 'Install.ps1'
@@ -833,46 +730,32 @@ function Install-ModuleFromWeb {
 <#
     .SYNOPSIS
         Install a module from a provided local path.
-
     .PARAMETER ModulePath
         Local path to the module to install.
-
     .PARAMETER ModuleName
         It is not always possible to interfere the right ModuleName, eg. the filename is unknown or the zip archive contains multiple modules.
-
     .PARAMETER Type
         When ModuleUrl or ModulePath specified, allows specifying type of the package. Can be ZIP or PSM1.
-
     .PARAMETER Destination
         When specified the module will be installed below this path. Defaults to '$global:PsGetDestinationModulePath' if defined.
-
     .PARAMETER ModuleHash
         When ModuleHash is specified the chosen module will only be installed if its contents match the provided hash.
-
     .PARAMETER Global
         If set, attempts to install the module to the all users location in C:\Program Files\Common Files\Modules...
-
         NOTE: If the -Destination directory is specified, then -Global will only have an effect in combination with '-PersistEnvironment'. This is also the case if '$global:PsGetDestinationModulePath' is defined.
-
     .PARAMETER DoNotImport
         Indicates that command should not import module after installation
-
     .PARAMETER AddToProfile
         Adds Import-Module statement for installed module to the profile.ps1
-
     .PARAMETER Update
         Forces module to be updated
-
     .PARAMETER PersistEnvironment
         If this switch is specified, the installation destination path will be added to either the User's PSModulePath environment variable or Machine's PSModulePath environment variable (if -Global specified)
-
     .PARAMETER InstallWithModuleName
         Allows to specify the name of the module and override the ModuleName normally used.
         NOTE: This parameter allows to install a module from the PsGet-Directory more than once and PsGet does not remember that this module is installed with a different name.
-
     .PARAMETER DoNotPostInstall
         If defined, the PostInstallHook is not executed.
-
     .PARAMETER PostInstallHook
         Defines the name of a script inside the installed module folder which should be executed after installation.
         Default: 'Install.ps1'
@@ -974,52 +857,36 @@ function Install-ModuleFromLocal {
 <#
     .SYNOPSIS
         Install a module from a NuGet source.
-
     .PARAMETER NuGetPackageId
         NuGet package name containing the module to install.
-
     .PARAMETER PackageVersion
         Allows a specific version of the specified NuGet package to used, if not specified then the latest stable version will be used.
-
     .PARAMETER NugetSource
         URL to the NuGet feed containing the package.
-
     .PARAMETER PreRelease
         If PackageVersion is not specified, then this switch allows the latest prerelease package to be used.
-
     .PARAMETER PreReleaseTag
         If PackageVersion is not specified, then this parameter allows the latest version of a particular prerelease tag to be used
-
     .PARAMETER Destination
         When specified the module will be installed below this path. Defaults to '$global:PsGetDestinationModulePath' if defined.
-
     .PARAMETER ModuleHash
         When ModuleHash is specified the chosen module will only be installed if its contents match the provided hash.
-
     .PARAMETER Global
         If set, attempts to install the module to the all users location in C:\Program Files\Common Files\Modules...
-
         NOTE: If the -Destination directory is specified, then -Global will only have an effect in combination with '-PersistEnvironment'. This is also the case if '$global:PsGetDestinationModulePath' is defined.
-
     .PARAMETER DoNotImport
         Indicates that command should not import module after installation
-
     .PARAMETER AddToProfile
         Adds Import-Module statement for installed module to the profile.ps1
-
     .PARAMETER Update
         Forces module to be updated
-
     .PARAMETER PersistEnvironment
         If this switch is specified, the installation destination path will be added to either the User's PSModulePath environment variable or Machine's PSModulePath environment variable (if -Global specified)
-
     .PARAMETER InstallWithModuleName
         Allows to specify the name of the module and override the ModuleName normally used.
         NOTE: This parameter allows to install a module from the PsGet-Directory more than once and PsGet does not remember that this module is installed with a different name.
-
     .PARAMETER DoNotPostInstall
         If defined, the PostInstallHook is not executed.
-
     .PARAMETER PostInstallHook
         Defines the name of a script inside the installed module folder which should be executed after installation.
         Default: 'Install.ps1'
@@ -1104,19 +971,14 @@ function Install-ModuleFromNuGet {
 <#
     .SYNOPSIS
         Adds value to a "Path" type of environment variable (PATH or PSModulePath).  Path type of variables munge the User and Machine values into the value for the current session.
-
     .PARAMETER Global
         The System.EnvironmentVariableTarget of what type of environment variable to modify ("Machine","User" or "Session")
-
     .PARAMETER PathToAdd
         The actual path to add to the environment variable
-
     .PARAMETER PersistEnvironment
         If specified, will permanently store the variable in registry
-
     .EXAMPLE
         AddPathToPSModulePath -Scope "Machine" -PathToAdd "$env:CommonProgramFiles\Modules"
-
         Description
         -----------
         This command add the path "$env:CommonProgramFiles\Modules" to the Machine PSModulePath environment variable
@@ -1180,10 +1042,8 @@ function Add-PathToPSModulePath {
 <#
     .SYNOPSIS
         Standardize the provided path.
-
     .DESCRIPTION
         A simple routine to standardize path formats.
-
     .PARAMETER Path
 #>
 function ConvertTo-CanonicalPath {
@@ -1200,10 +1060,8 @@ function ConvertTo-CanonicalPath {
 <#
     .SYNOPSIS
         Find the module file in the given path.
-
     .PARAMETER Path
         Path of module
-
     .PARAMETER ModuleName
         Name of the Module
 #>
@@ -1243,7 +1101,6 @@ function Get-ModuleFile {
 <#
     .SYNOPSIS
         Get list of possible names for the module file.
-
     .PARAMETER ModuleName
         Name of the module
 #>
@@ -1261,10 +1118,8 @@ function Get-PossibleModuleFileNames {
 <#
     .SYNOPSIS
         Search in the provided folder for a module, if possible with the provided name.
-
     .PARAMETER Path
         Path to search in for the module.
-
     .PARAMETER ModuleName
         ModuleName which is expected.
 #>
@@ -1303,11 +1158,9 @@ function Find-ModuleNameAndFolder {
 <#
     .SYNOPSIS
         Import given modele
-
     .DESCRIPTION
         Import given module with switch -Global (functions available to other modules) and avoid
         a Powershell bug related to binary modules.
-
     .$
 #>
 function Import-ModuleGlobally {
@@ -1340,23 +1193,17 @@ function Import-ModuleGlobally {
 <#
     .SYNOPSIS
         Download module from URL
-
     .DESCRIPTION
         Download module from URL and try to interfere unknown parameter.
         If download target is a zip-archive it will be extracted.
-
         Returns a map containing the TempFolderPath, ModuleFolderPath and ModuleName.
         The TempFolderPath should be removed after processing the result.
-
     .PARAMETER DownloadUrl
         URL to the module delivery file.
-
     .PARAMETER ModuleName
         Name of the module.
-
     .PARAMETER Type
         Type of the module delivery file.
-
     .PARAMETER Verb
         Http method used for download.
 #>
@@ -1483,54 +1330,39 @@ function Invoke-DownloadModuleFromWeb {
 <#
     .SYNOPSIS
         Install the provided module into the defined destination.
-
     .DESCRIPTION
         Install the module inside of the provided directory into the defined destination
         and perform the following steps:
-
         * Rename module if requestes by provided InstallWithModuleName
         * If a ModuleHash is provided, check if it matches.
         * Add the destination path to the PSModulePath if necessary (depends on provided parameters)
         * Place the conventions-matching module folder in the destination folder
         * Import the module if necessary
         * Add the profile import to profile if necessary
-
     .PARAMETER ModuleName
         The name of the module.
-
     .PARAMETER InstallWithModuleName
         The name the module should get.
-
     .PARAMETER ModuleFolderPath
         The path to the module data, which contains the module main file, named according to ModuleName
-
     .PARAMETER TempFolderPath
         TempPath used by PsGet for doing the work. Contains the ModuleFolderPath and will be deleted after processing,
-
     .PARAMETER Destination
         Path to which the module will be installed.
-
     .PARAMETER ModuleHash
         When ModuleHash is specified the chosen module will only be installed if its contents match the provided hash.
-
     .PARAMETER Global
         Influence the PSModulePath changes and profile changes.
-
     .PARAMETER PersistEnvironment
         Defines if the PSModulePath changes should be persistent.
-
     .PARAMETER DoNotImport
         Defines if the installed module should be imported.
-
     .PARAMETER AddToProfile
         Defines if an 'Import-Module' statement should be added to the profile.
-
     .PARAMETER Update
         Defines if an already existing folder in the target may be deleted for installation of the module.
-
     .PARAMETER DoNotPostInstall
         If defined, the PostInstallHook is not executed.
-
     .PARAMETER PostInstallHook
         Defines the name of a script inside the installed module folder which should be executed after installation.
 #>
@@ -1700,23 +1532,17 @@ function Install-ModuleToDestination {
 <#
     .SYNOPSIS
         Test if module is installed and import it then.
-
     .DESCRIPTION
         Test if module with provided name is installed in the target destination.
         If it is installed, it will be imported. Returns '$true' if installed.
-
     .PARAMETER ModuleName
         Name of the module
-
     .PARAMETER Destination
         Installation destination
-
     .PARAMETER Update
         If 'Update'-switch is set, this returns always '$true'.
-
     .PARAMETER DoNotImport
         Switch suppress the import of module.
-
     .PARAMETER ModuleHash
         If a hash is provided an installed module will only be accepted as installed if the hash match.
 #>
@@ -1797,10 +1623,8 @@ function Test-ModuleInstalledAndImport {
 <#
     .SYNOPSIS
         Extract the content of the referenced zip file to the defind destination
-
     .PARAMATER Path
         Path to a zip file with the file extension '.zip'
-
     .Parameter Destination
         Path to which the zip content is extracted
 #>
@@ -1887,19 +1711,14 @@ function Update-PSModulePath {
 <#
     .SYNOPSIS
         Download a module of type NuGet package
-
     .PARAMETER NuGetPackageId
         NuGet package id
-
     .PARAMETER PackageVersion
         Specific version to be installed. If not defined, install newest.
-
     .PARAMETER Source
         NuGet source url
-
     .PARAMETER PreRelease
         If no PackageVersion is defined, may PreReleases be used?
-
     .PARAMETER PreReleaseTag
         If PreReleases may be used, also use prereleases of a special tag?
 #>
@@ -1971,13 +1790,10 @@ function Invoke-DownloadNuGetPackage {
 <#
     .SYNOPSIS
         Find the latest release in the provided NuGet feed for the NuGet package id.
-
     .PARAMETER Feed
         Xml feed node for NuGet package
-
     .PARAMETER PreRelease
         If no PackageVersion is defined, may PreReleases be used?
-
     .PARAMETER PreReleaseTag
         If PreReleases may be used, also use prereleases of a special tag?
 #>
@@ -2023,7 +1839,6 @@ function Find-LatestNugetPackageFromFeed {
 <#
     .SYNOPSIS
         Calculate a hash for the given file
-
     .PARAMETER Path
         File path for hasing
 #>
@@ -2057,7 +1872,6 @@ function Get-FileHash {
 <#
     .SYNOPSIS
         Calculate a hash for the given directory.
-
     .PARAMETER Path
         Path to the folder which should be hashed.
 #>
