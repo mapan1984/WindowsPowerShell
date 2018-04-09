@@ -4,13 +4,27 @@ Push-Location (Split-Path -Path $MyInvocation.MyCommand.Definition -Parent)
 
 ### Load Module Plug
 Import-Module PSColor
-Import-Module posh-git
-Import-Module PowerTab -ArgumentList ".\PowerTabConfig.xml"
-Import-Module PsGet
+#$poshGitModule = Get-Module posh-git -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1
+#if ($poshGitModule) {
+#    $poshGitModule | Import-Module
+#}
+#elseif (Test-Path -LiteralPath ($modulePath = Join-Path (Split-Path $MyInvocation.MyCommand.Path -Parent) (Join-Path src 'posh-git.psd1'))) {
+#    Import-Module $modulePath
+#}
+#else {
+#    throw "Failed to import posh-git."
+#}
+#Import-Module posh-git
+#Import-Module PowerTab -ArgumentList ".\PowerTabConfig.xml"
+#Import-Module PsGet
 
 ### All alias
 Set-Alias -Name l -Value Get-ChildItem
 Set-Alias -Name vi -Value Code
+
+### Add user path
+$currentDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$env:Path+=($currentDir)+"\Bin;"
 
 ### Set up prompt
 # Get full name of user
@@ -28,7 +42,7 @@ function global:prompt {
     $realLASTEXITCODE = $LASTEXITCODE
 
     # username@hostname
-    if($IsAdmin){
+    if ($IsAdmin) {
         write-host $username -nonewline -ForegroundColor Red
     } else {
         write-host $username -nonewline -ForegroundColor Cyan
