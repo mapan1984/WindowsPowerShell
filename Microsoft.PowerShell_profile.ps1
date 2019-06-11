@@ -75,6 +75,9 @@ function global:prompt {
     return " "
 }
 
+# 设置 EditMode
+Set-PSReadLineOption -EditMode Emacs
+
 <#
 Pop-Location
 
